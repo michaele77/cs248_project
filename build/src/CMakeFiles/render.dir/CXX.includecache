@@ -332,18 +332,6 @@ dynamic_scene/scene.h
 camera.h
 /Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/camera.h
 
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/bbox.cpp
-bbox.h
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/bbox.h
-GL/glew.h
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/GL/glew.h
-CS248/spectrum.h
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/CS248/spectrum.h
-algorithm
--
-iostream
--
-
 /Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/bbox.h
 utility
 -
@@ -588,14 +576,6 @@ scene.h
 ../static_scene/light.h
 /Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/static_scene/light.h
 
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/gl_resource_manager.cpp
-gl_resource_manager.h
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/gl_resource_manager.h
-iostream
--
-GL/glew.h
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/GL/glew.h
-
 /Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/gl_resource_manager.h
 memory
 -
@@ -604,14 +584,6 @@ utility
 vector
 -
 string
--
-GL/glew.h
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/GL/glew.h
-
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/gl_utils.cpp
-gl_utils.h
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/gl_utils.h
-iostream
 -
 GL/glew.h
 /Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/GL/glew.h
@@ -632,18 +604,6 @@ application.h
 iostream
 -
 
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/shader.cpp
-shader.h
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/shader.h
-fstream
--
-string
--
-iostream
--
-gl_utils.h
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/gl_utils.h
-
 /Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/shader.h
 map
 -
@@ -659,16 +619,6 @@ GL/glew.h
 /Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/GL/glew.h
 gl_resource_manager.h
 /Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/gl_resource_manager.h
-
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/static_scene/light.cpp
-light.h
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/static_scene/light.h
-CS248/matrix4x4.h
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/static_scene/CS248/matrix4x4.h
-CS248/vector3D.h
-/Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/static_scene/CS248/vector3D.h
-iostream
--
 
 /Users/ershov/Desktop/School/StanfordNDO/CS248/project/BRDF_project/src/static_scene/light.h
 CS248/vector3D.h

@@ -154,6 +154,15 @@ vec3 strange_normal_BRDF(vec3 L, vec3 V, vec3 N, vec3 diffuse_color, vec3 specul
     return diffuse*diffuse_color;
 }
 
+vec3 texture_map(vec3 L, vec3 V, vec3 N, vec3 diffuse_color, vec3 specular_color, float specular_exponent)
+{
+    float theta = dot(normalize(L), normalize(N));
+    float phi = dot(normalize(V), normalize(N));
+    vec2 new_text_coords = vec2(theta, phi);
+    return texture(diffuseTextureSampler, texcoord).rgb;
+
+}
+
 
 // Function to choose BRDF
 vec3 choose_BRDF(vec3 L, vec3 V, vec3 N, vec3 diffuse_color, vec3 specular_color, float specular_exponent) {
@@ -166,6 +175,10 @@ vec3 choose_BRDF(vec3 L, vec3 V, vec3 N, vec3 diffuse_color, vec3 specular_color
             return debug_BRDF(L, V, N, diffuse_color, specular_color, specular_exponent);
         case 3:
             return strange_normal_BRDF(L, V, N, diffuse_color, specular_color, specular_exponent);
+        case 4:
+            // This case is used for purely precomputer BRDFs
+            // In this case, our "diffuse" texture is actually whatever texture we are trying to sample
+            return texture_map(L, V, N, diffuse_color, specular_color, specular_exponent);
     }
 
     // if (BRDF_NUM == 0) {
@@ -202,19 +215,7 @@ void main(void)
     // perform normal map lookup if required
     vec3 N = vec3(0);
     if (useNormalMapping) {
-       // TODO: CS248 Normal Mapping:
-       // use tan2World in the normal map to compute the
-       // world space normal baaed on the normal map.
-
-       // Note that values from the texture should be scaled by 2 and biased
-       // by negative -1 to covert positive values from the texture fetch, which
-       // lie in the range (0-1), to the range (-1,1).
-       //
-       // In other words:   tangent_space_normal = texture_value * 2.0 - 1.0;
-
-       // replace this line with your implementation
-        N = texture(normalTextureSampler, texcoord).rgb;
-        
+        N = texture(normalTextureSampler, texcoord).rgb;     
         // N = normal;
         N = N * 2.0 - 1.0;
 
@@ -233,11 +234,6 @@ void main(void)
     /////////////////////////////////////////////////////////////////////////
 
     if (useMirrorBRDF) {
-        //
-        // TODO: CS248 Environment Mapping:
-        // compute perfect mirror reflection direction here.
-        // You'll also need to implement environment map sampling in SampleEnvironmentMap()
-        //
         vec3 R = normalize(vec3(1.0));
         R = reflect(normalize(-dir2camera), normalize(normal));
 
@@ -284,32 +280,7 @@ void main(void)
         vec3 dir_to_surface = position - light_pos;
         float angle = acos(dot(normalize(dir_to_surface), spot_light_directions[i])) * 180.0 / PI;
 
-        // CS248 TODO Spotlight Attenuation: compute the attenuation of the spotlight due to two factors:
-        // (1) distance from the spot light (D^2 falloff)
-        // (2) attentuation due to being outside the spotlight's cone 
-        //
-        // Here is a description of what to compute:
-        //
-        // 1. Modulate intensity by a factor of 1/D^2, where D is the distance from the
-        //    spotlight to the current surface point.  For robustness, it's common to use 1/(1 + D^2)
-        //    to never multiply by a value greather than 1.
-        //
-        // 2. Modulate the resulting intensity based on whether the surface point is in the cone of
-        //    illumination.  To achieve a smooth falloff, consider the following rules
-        //    
-        //    -- Intensity should be zero if angle between the spotlight direction and the vector from
-        //       the light position to the surface point is greater than (1.0 + SMOOTHING) * cone_angle
-        //
-        //    -- Intensity should not be further attentuated if the angle is less than (1.0 - SMOOTHING) * cone_angle
-        //
-        //    -- For all other angles between these extremes, interpolate linearly from unattenuated
-        //       to zero intensity. 
-        //
-        //    -- The reference solution uses SMOOTHING = 0.1, so 20% of the spotlight region is the smoothly
-        //       facing out area.  Smaller values of SMOOTHING will create hard spotlights.
-
-        // CS248: remove this once you perform proper attenuation computations
-        // intensity = vec3(0.5, 0.5, 0.5);
+      
         
         // Step 1.
         float D = length(dir_to_surface);
@@ -358,9 +329,7 @@ void main(void)
         // and attenuate illumination accordingly
 
 
-        
-        
-
+    
 	    vec3 L = normalize(-spot_light_directions[i]);
 		// vec3 brdf_color = Phong_BRDF(L, V, N, diffuseColor, specularColor, specularExponent);
         vec3 brdf_color = choose_BRDF(L, V, N, diffuseColor, specularColor, specularExponent);

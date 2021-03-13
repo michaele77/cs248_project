@@ -70,14 +70,14 @@
             "translate" : [70, 30, 10],
             "scale" : [1.4, 1.4, 1.4],
             "material" : "phong",
-			"diffuse_filename" : "../textures/meme_text_1.png",
+			"diffuse_filename" : "../textures/debug_fake_butterfly_wings.png",
 			"normal_filename" : "../textures/Stone_Tiles_003_NORM.png",
 			"spec_exp" : 30.0,
 			"texcoord_v_flip" : "true",
-            "texcoord_u_scale" : 3,
-            "texcoord_v_scale" : 3,
-			"vertex_shader_filename" : "../shader_shadow.vert",
-			"fragment_shader_filename" : "../shader_shadow.frag"
+            "texcoord_u_scale" : 1,
+            "texcoord_v_scale" : 1,
+			"vertex_shader_filename" : "../shader_thinfilm.vert",
+			"fragment_shader_filename" : "../shader_thinfilm.frag"
 		},
         
 		{
