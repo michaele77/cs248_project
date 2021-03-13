@@ -23,7 +23,7 @@ uniform sampler2DArray shadowTextureSampler;
 // and point light sources, as well as an environment map
 //
 
-#define BRDF_NUM 1
+#define BRDF_NUM 4
 #define MAX_NUM_LIGHTS 5
 uniform int  num_directional_lights;
 uniform vec3 directional_light_vectors[MAX_NUM_LIGHTS];
@@ -156,10 +156,38 @@ vec3 strange_normal_BRDF(vec3 L, vec3 V, vec3 N, vec3 diffuse_color, vec3 specul
 
 vec3 texture_map(vec3 L, vec3 V, vec3 N, vec3 diffuse_color, vec3 specular_color, float specular_exponent)
 {
-    float theta = dot(normalize(L), normalize(N));
-    float phi = dot(normalize(V), normalize(N));
+    vec3 L_norm = normalize(L);
+    vec3 V_norm = normalize(V);
+    vec3 N_norm = normalize(N);
+
+    // When sampling texture coordinate, we use the following nomeclature:
+    // u --> incident angle of incoming light relative to +x axis
+    // v --> angle required to reflect light to eye, or "reflected" angle, relative to +x axis
+
+    // Here we calculate if the viewer's vector is on the "opposide side" of the plane formed by incident vector and normal vector
+    // if is_opposite == true, then the surface can be seen if the surface was a strongly reflective/diffuse surface 
+    // if is_opposite == false, then the viewer can only see the surface is some of the light "bounces back" towards the light
+    // vec3 temp_inc = cross(L_norm, N_norm);
+    // vec3 temp_refl = cross(N_norm, V_norm);
+    // float opp_side = dot(temp_inc, temp_refl);
+    // bool is_opposite = opp_side >= 0;
+
+
+    // Now we define a basis coordinate system from which we can calculate our radial coordinates
+    // Define X axis as the axis "underneath" the incoming light
+    vec3 naxis_Y = cross(vec3(1,0,0), N_norm);
+    naxis_Y = normalize(naxis_Y);
+    vec3 naxis_X = cross(naxis_Y, N_norm);
+
+    float theta = 0.5 * (1 - dot(naxis_X, L_norm));
+    float phi = 0.5 * (1 - dot(naxis_X, V_norm));
     vec2 new_text_coords = vec2(theta, phi);
-    return texture(diffuseTextureSampler, texcoord).rgb;
+
+
+    vec3 color_to_see = texture(diffuseTextureSampler, new_text_coords).rgb; 
+    color_to_see = dot(L_norm, N_norm) * color_to_see; // use lampertian shading: I = dot(L,N)*mapped_tex*intensity  <--  no intensity, multiplied later 
+    
+    return color_to_see;
 
 }
 

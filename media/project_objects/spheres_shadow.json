@@ -64,22 +64,6 @@
 			"fragment_shader_filename" : "../shader_shadow.frag"
 		},
 
-
-        {
-			"filename" : "sphere.obj",
-            "translate" : [70, 30, 10],
-            "scale" : [1.4, 1.4, 1.4],
-            "material" : "phong",
-			"diffuse_filename" : "../textures/debug_fake_butterfly_wings.png",
-			"normal_filename" : "../textures/Stone_Tiles_003_NORM.png",
-			"spec_exp" : 30.0,
-			"texcoord_v_flip" : "true",
-            "texcoord_u_scale" : 1,
-            "texcoord_v_scale" : 1,
-			"vertex_shader_filename" : "../shader_thinfilm.vert",
-			"fragment_shader_filename" : "../shader_thinfilm.frag"
-		},
-        
 		{
 			"filename" : "sphere.obj",
             "translate" : [0, 0, 0],
@@ -148,6 +132,33 @@
             "texcoord_v_scale" : 4,
 			"vertex_shader_filename" : "../shader_shadow.vert",
 			"fragment_shader_filename" : "../shader_shadow.frag"
-		}    
+		},
+
+
+		{
+			"filename" : "sphere.obj",
+            "translate" : [70, 30, 10],
+            "scale" : [1.4, 1.4, 1.4],
+            "material" : "phong",
+			"diffuse_filename" : "../textures/debug_fake_butterfly_wings.png",
+			"normal_filename" : "../textures/Stone_Tiles_003_NORM.png",
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 1,
+            "texcoord_v_scale" : 1,
+			"vertex_shader_filename" : "../shader_thinfilm.vert",
+			"fragment_shader_filename" : "../shader_thinfilm.frag"
+		},
+
+		{
+			"filename" : "plane.obj",
+            "translate" : [0, 30, 0],
+            "material" : "phong",
+			"diffuse_filename" : "../textures/debug_fake_butterfly_wings.png",
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 1,
+            "texcoord_v_scale" : 1,
+			"vertex_shader_filename" : "../shader_thinfilm.vert",
+			"fragment_shader_filename" : "../shader_thinfilm.frag"
+		}
 	]
 }
