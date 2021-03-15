@@ -1,0 +1,143 @@
+{
+    "base_shader_dir" : "..",
+    
+	"camera" :
+	{
+		"id" : "Camera_001-camera",
+		"name" : "Camera.002",
+		"xfov" : 50,
+		"yfov" : 35,
+		"znear" : 0.1,
+		"zfar" : 10000.0,
+		"aspect_ratio" : 1.777778,
+		"up_axis" : "Y_UP",
+		"target_position" : [0, 0, 0],
+		"dir2cam" : [13, 31, 162]
+	},
+    
+    "lights" :
+	[
+		{
+			"id" : "spotlight",
+		    "name" : "main_spotlight",
+			"type" : "spot",
+            "position" : [0, 200, 200],
+			"direction" : [0, -1, -1],
+            "falloff_deg" : 20.0,
+            "intensity" : [40000, 40000, 40000]
+		},
+
+        {
+			"id" : "spotlight",
+		    "name" : "main_spotlight",
+			"type" : "spot",
+            "position" : [0, 200, 200],
+			"direction" : [0, -1, -1],
+            "falloff_deg" : 20.0,
+            "intensity" : [40000, 12000, 12000]
+		},
+
+		{
+			"id" : "spotlight",
+		    "name" : "main_spotlight",
+			"type" : "spot",
+            "position" : [0, 200, 200],
+			"direction" : [0, -1, -1],
+            "falloff_deg" : 20.0,
+            "intensity" : [12000, 40000, 40000]
+		}
+
+	],
+    
+    "meshes" :
+	[
+
+		{
+			"filename" : "butterfly_upright.obj",
+            "translate" : [-60, 0, 0],
+            "scale" : [20, 20, 20],
+            "material" : "phong",
+			"diffuse_filename" : "../textures/debug_fake_butterfly_wings.png",
+			"normal_filename" : "../textures/Blue_Marble_002_NORM.png",
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 1,
+            "texcoord_v_scale" : 1,
+			"vertex_shader_filename" : "../shader_thinfilm.vert",
+			"fragment_shader_filename" : "../shader_thinfilm.frag"
+		},
+
+		{
+			"filename" : "sphere.obj",
+            "translate" : [0, 50, 0],
+            "material" : "phong",
+			"diffuse_filename" : "../textures/Blue_Marble_002_COLOR.png",
+			"normal_filename" : "../textures/Blue_Marble_002_NORM.png",
+			"spec_exp" : 10.0,
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 1,
+            "texcoord_v_scale" : 1,
+			"vertex_shader_filename" : "../shader_shadow.vert",
+			"fragment_shader_filename" : "../shader_shadow.frag"
+		},
+
+		{
+			"filename" : "sphere.obj",
+            "translate" : [0, 0, 0],
+            "scale" : [0.9, 0.9, 0.9],
+            "material" : "phong",
+			"diffuse_filename" : "../textures/debug_fake_butterfly_wings.png",
+			"normal_filename" : "../textures/Blue_Marble_002_NORM.png",
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 1,
+            "texcoord_v_scale" : 1,
+			"vertex_shader_filename" : "../shader_thinfilm.vert",
+			"fragment_shader_filename" : "../shader_thinfilm.frag"
+		},
+
+		{
+			"filename" : "sphere.obj",
+            "translate" : [0, -50, 0],
+            "scale" : [0.9, 0.9, 0.9],
+            "material" : "phong",
+			"diffuse_filename" : "../textures/diffusehole_4_blurred.png",
+			"normal_filename" : "../textures/Blue_Marble_002_NORM.png",
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 1,
+            "texcoord_v_scale" : 1,
+			"vertex_shader_filename" : "../shader_thinfilm.vert",
+			"fragment_shader_filename" : "../shader_thinfilm.frag"
+		},
+
+		{
+			"filename" : "butterfly_upright.obj",
+            "translate" : [60, 0, 0],
+            "scale" : [20, 20, 20],
+            "material" : "phong",
+			"diffuse_filename" : "../textures/diffusehole_4_blurred.png",
+			"normal_filename" : "../textures/Blue_Marble_002_NORM.png",
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 1,
+            "texcoord_v_scale" : 1,
+			"vertex_shader_filename" : "../shader_thinfilm.vert",
+			"fragment_shader_filename" : "../shader_thinfilm.frag"
+		},
+		
+        
+		{
+			"filename" : "plane.obj",
+            "translate" : [0, -20, 0],
+            "material" : "phong",
+			"diffuse_filename" : "../textures/Stone_Tiles_003_COLOR.png",
+            "normal_filename" : "../textures/Stone_Tiles_003_NORM.png",
+            "spec_exp" : 20.0,
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 4,
+            "texcoord_v_scale" : 4,
+			"vertex_shader_filename" : "../shader_shadow.vert",
+			"fragment_shader_filename" : "../shader_shadow.frag"
+		}
+
+
+		
+	]
+}

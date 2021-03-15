@@ -147,18 +147,8 @@
             "texcoord_v_scale" : 1,
 			"vertex_shader_filename" : "../shader_thinfilm.vert",
 			"fragment_shader_filename" : "../shader_thinfilm.frag"
-		},
-
-		{
-			"filename" : "plane.obj",
-            "translate" : [0, 30, 0],
-            "material" : "phong",
-			"diffuse_filename" : "../textures/debug_fake_butterfly_wings.png",
-			"texcoord_v_flip" : "true",
-            "texcoord_u_scale" : 1,
-            "texcoord_v_scale" : 1,
-			"vertex_shader_filename" : "../shader_thinfilm.vert",
-			"fragment_shader_filename" : "../shader_thinfilm.frag"
 		}
+
+		
 	]
 }

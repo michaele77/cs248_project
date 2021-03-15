@@ -31,7 +31,7 @@ from PIL import ImageFilter
 # -----------------------------------------------------------------------------#
 if __name__ == "__main__":
 
-    im = Image.open("diffusehole_3.png")
+    im = Image.open("diffusehole_4.png")
 
     out_im = im.filter(ImageFilter.GaussianBlur(radius=3))
 

@@ -133,7 +133,7 @@ def construct_branches(focal_ang):
     while step_track < branching_rays:
         prefix_ang = sampled_angles[0] - incr_deg
         suffix_ang = sampled_angles[-1] + incr_deg
-        incr_deg = math.ceil(incr_deg * 1.4) ## 1.6 and above lead to some weirdness...
+        incr_deg = math.ceil(incr_deg * 1.1) ## 1.6 and above lead to some weirdness...
 
 
 
@@ -272,15 +272,15 @@ def trace_ray(ray_to_trace, tracker):
 if __name__ == "__main__":
     print("hello!")
     ## Defining simulation-critical parameters
-    branching_rays = 13 # How many rays spin off each reflection
-    original_color =  np.array([255,255,255]) #Color((0,0,0)) # This is black
-    polluting_color = np.array([0,-20,0]) #Color((20,0,0)) # This is a hint of red
+    branching_rays = 17 # How many rays spin off each reflection
+    original_color =  np.array([0,0,0]) #Color((0,0,0)) # This is black
+    polluting_color = np.array([20,0,20]) #Color((20,0,0)) # This is a hint of red
     t_iter = 0.05 # parameterization variable step size
 
     branching_iter = 180 / branching_rays
     branch_dir_arr = np.linspace(branching_iter / 2, 180 - branching_iter / 2, branching_rays)
 
-    bounce_limit = 4 # Limit on ray_trace recursion, point at which ray will "dissapear"
+    bounce_limit = 6 # Limit on ray_trace recursion, point at which ray will "dissapear"
 
     ## First, let's set up the dimensions of our laser hole!
     ## Make it a square for now
@@ -294,7 +294,8 @@ if __name__ == "__main__":
 
     u_pixels = round(180/iter_theta)
     v_pixels = round(180/iter_phi)
-    texture = 255*np.ones((u_pixels, v_pixels, 3), dtype=np.uint8)
+    # texture = 255*np.ones((u_pixels, v_pixels, 3), dtype=np.uint8)
+    texture = 0 * np.ones((u_pixels, v_pixels, 3), dtype=np.uint8)
 
     # texture = [[0]*v_pixels for ttt in range(u_pixels)]
 

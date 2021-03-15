@@ -48,6 +48,7 @@ Matrix4x4 createWorldToCameraMatrix(const Vector3D& eye, const Vector3D& at, con
   // TODO CS248: Camera Matrix
   // Compute the matrix that transforms a point in world space to a point in camera space.
     Vector3D cameraPos = eye;
+    // Vector3D cameraTarget = Vector3D(0,0,0);
     Vector3D cameraTarget = at;
     Vector3D D = (cameraPos - cameraTarget);
     D.normalize();
@@ -61,10 +62,15 @@ Matrix4x4 createWorldToCameraMatrix(const Vector3D& eye, const Vector3D& at, con
     // LookAt is rotation * translation
 
     Matrix4x4 rot;
-    rot(0,0) = R.x; rot(0,1) = R.y; rot(0,2) = R.z; rot(0,3) = 0.0;
+    rot(0,0) = R.x;  rot(0,1) = R.y;  rot(0,2) = R.z;  rot(0,3) = 0.0;
     rot(1, 0) = U.x; rot(1, 1) = U.y; rot(1, 2) = U.z; rot(1, 3) = 0.0;
     rot(2, 0) = D.x; rot(2, 1) = D.y; rot(2, 2) = D.z; rot(2, 3) = 0.0;
     rot(3, 0) = 0.0; rot(3, 1) = 0.0; rot(3, 2) = 0.0; rot(3, 3) = 1.0;
+
+    // rot(0,0) = R.x; rot(0,1) = U.x; rot(0,2) = D.x; rot(0,3) = 0.0;
+    // rot(1, 0) = R.y; rot(1, 1) = U.y; rot(1, 2) = D.y; rot(1, 3) = 0.0;
+    // rot(2, 0) = R.z; rot(2, 1) = U.z; rot(2, 2) = D.z; rot(2, 3) = 0.0;
+    // rot(3, 0) = 0.0; rot(3, 1) = 0.0; rot(3, 2) = 0.0; rot(3, 3) = 1.0;
 
     //rot[0][0] = R.x; rot[0][1] = R.y; rot[0][2] = R.z; rot[0][3] = 0.0;
     //rot[1][0] = U.x; rot[1][1] = U.y; rot[1][2] = U.z; rot[1][3] = 0.0;
