@@ -11,6 +11,7 @@ import colour
 # -----------------------------------------------------------------------------#
 #                                 DEFINES                                      #
 # -----------------------------------------------------------------------------#
+## Got the CIE color curves from the following: https://www.fourmilab.ch/documents/specrend/specrend.c
 ## 380nm to 780nm every 5nm
 CIE_wavlen = np.linspace(380e-9, 780e-9, 81)
 CIE_color_match = np.array([ [0.0014,0.0000,0.0065], [0.0022,0.0001,0.0105], [0.0042,0.0001,0.0201], \
@@ -104,108 +105,20 @@ def convert_to_rgb(fx,fy,fz):
     return rgb_vec
 
 
-
-# -----------------------------------------------------------------------------#
-#                                   MAIN                                       #
-# -----------------------------------------------------------------------------#
-if __name__ == "__main__":
-    R_list = []
-    T_list = []
-    for i in range(90):
-
-        ## SIMULATION PARAMETERS ##
-        n_1 = 1 # Assume to be air
-        n_2 = 1.3 # Assume to be an oil of some sort
-        d = 500e-9 # in meters
-        th_i = math.radians(i)
-        th_r = th_i
-        th_t = math.asin( n_1*math.sin(th_i)/n_2 )
-        Z0 = 376.7303 # constant
-        z_1 = Z0 / n_1
-        z_2 = Z0 / n_2
-        R_s = ( ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ) ** 2
-        R_p = ( ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ) ** 2
-        R = 0.5 * (R_s + R_p)
-        T = 1 - R
-        R_list.append(R)
-        T_list.append(T)
-
-    print(R)
-    print(T)
-
-
-    ## PHYSICAL PARAMETERS ##
-    n_1 = 1  # Assume to be air
-    n_2 = 1.3  # Assume to be an oil of some sort
-    reflected_1_2 = n_2 > n_1 # IF n_2 > n_1, directly reflected power has a 180 degree phase shift
-    n_3 = 1.5 # Used ony as base condition, enforces pi shift off base
-    reflected_2_3 = n_3 > n_2
-    d = 200e-9  # in meters
-    th_i = math.radians(30)
-    th_r = th_i
-    th_t = math.asin(n_1 * math.sin(th_i) / n_2)
-    OPD = 2 * n_2 * d * math.cos(th_t) # Optical path difference, phase shift due to longer transmitted path
-    Z0 = 376.7303  # constant
-    ## Calculate reflectance/transmission going 1 --> 2
-    z_1 = Z0 / n_1
-    z_2 = Z0 / n_2
-    R_s = ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ** 2
-    R_p = ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ** 2
-    R = 0.5 * (R_s + R_p)
-    T = 1 - R
-    ## Calculate reflectance/transmission going 2 --> 1
-    z_1 = Z0 / n_2
-    z_2 = Z0 / n_1
-    Ru_s = ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ** 2
-    Ru_p = ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ** 2
-    Ru = 0.5 * (Ru_s + Ru_p)
-    Tu = 1 - Ru
-    ## Quick and dirty perfect base reflector assumption
-    R_base = 1
-    T_base = 0
-
-    ## SIMULATION PARAMETERS ##
-    num_inter_refl = 3
-
-
-
-
-
-
-
-
-    spectrum_num = 1000
-    wavlen_min = 300e-9 # in meters
-    wavlen_max = 800e-9 # in meters
-
-    specturm_wavlen = np.linspace(wavlen_min, wavlen_max, spectrum_num)
-    master_spectrum = np.ones(spectrum_num) # This is the incident spectrum can define to something else later!
-
-
-    ## Plot some stuff first
-    plt.figure()
-    plt.plot([i for i in range(90)], R_list)
-    plt.plot([i for i in range(90)], T_list)
-    plt.legend(['reflectance', 'transmission'])
-    plt.show()
-
-    plt.figure()
-    plt.plot(specturm_wavlen, master_spectrum)
-    plt.show()
-
-
+def compute_thinfilm():
+    ## Use parameters defined in global main
 
 
     ## We compute inter_refl number of reflections
     ## We define 1 inter_refl as a transmission at the surface, reflection at the base, and
     ## ESSSENTIALLY, num_inter_refl is how many additional outgoing reflections we want AFTER the first!
     ##      So num_inter_refl = 2 will result in 3 total reflections to be summed
-    output_spectrum = np.zeros(spectrum_num, dtype=np.complex128) # Allocate our output spectrum
-    for indx,i in enumerate(master_spectrum):
+    output_spectrum = np.zeros(spectrum_num, dtype=np.complex128)  # Allocate our output spectrum
+    for indx, i in enumerate(master_spectrum):
         output_spectrum[indx] = i
 
     for i, cur_wavlen in enumerate(specturm_wavlen):
-        OPD_phase = 2*math.pi*(OPD / cur_wavlen)
+        OPD_phase = 2 * math.pi * (OPD / cur_wavlen)
         in_pow = master_spectrum[i]
         outgoing_refl = []
         outgoing_shift = []
@@ -214,10 +127,9 @@ if __name__ == "__main__":
         reflected = R * in_pow
         refl_phase = math.pi if reflected_1_2 else 0
 
-
         outgoing_refl.append(reflected)
         outgoing_shift.append(refl_phase)
-        outgoing_complex.append(reflected * np.exp(refl_phase*1j))
+        outgoing_complex.append(reflected * np.exp(refl_phase * 1j))
 
         transmitted = T * in_pow
         trans_phase = 0
@@ -248,30 +160,141 @@ if __name__ == "__main__":
             output_spectrum[i] += iter_outgoing
 
     ## take magnitude and normalize output spectrum
-    spectrum_norm_mag = abs(output_spectrum) / 2 # Divide by 2 to take into account potential full reflection
+    spectrum_norm_mag = abs(output_spectrum) / 2  # Divide by 2 to take into account potential full reflection
+
+
+    x, y, z = sample_CIE_color(specturm_wavlen, spectrum_norm_mag)
+    fr, fg, fb = convert_to_rgb(x, y, z)
+
+    return fr,fg,fb,spectrum_norm_mag
+
+
+def recalculate_global_params(new_th):
+    global th_i, th_r, th_t, OPD, R, T, Ru, Tu
+    th_i = math.radians(new_th)
+    th_r = th_i
+    th_t = math.asin(n_1 * math.sin(th_i) / n_2)
+    OPD = 2 * n_2 * d * math.cos(th_t)  # Optical path difference, phase shift due to longer transmitted path
+    ## Calculate reflectance/transmission going 1 --> 2
+    z_1 = Z0 / n_1
+    z_2 = Z0 / n_2
+    R_s = ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ** 2
+    R_p = ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ** 2
+    R = 0.5 * (R_s + R_p)
+    T = 1 - R
+    ## Calculate reflectance/transmission going 2 --> 1
+    z_1 = Z0 / n_2
+    z_2 = Z0 / n_1
+    Ru_s = ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ** 2
+    Ru_p = ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ** 2
+    Ru = 0.5 * (Ru_s + Ru_p)
+    Tu = 1 - Ru
+
+
+
+
+# -----------------------------------------------------------------------------#
+#                                   MAIN                                       #
+# -----------------------------------------------------------------------------#
+if __name__ == "__main__":
+    R_list = []
+    T_list = []
+    for i in range(90):
+
+        ## SIMULATION PARAMETERS ##
+        n_1 = 1 # Assume to be air
+        n_2 = 1.3 # Assume to be an oil of some sort
+        d = 500e-9 # in meters
+        th_i = math.radians(i)
+        th_r = th_i
+        th_t = math.asin( n_1*math.sin(th_i)/n_2 )
+        Z0 = 376.7303 # constant
+        z_1 = Z0 / n_1
+        z_2 = Z0 / n_2
+        R_s = ( ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ) ** 2
+        R_p = ( ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ) ** 2
+        R = 0.5 * (R_s + R_p)
+        T = 1 - R
+        R_list.append(R)
+        T_list.append(T)
+
+
+    ## TODO: Might need to calculate R_s and R_p seperately? not sure
+    ## PHYSICAL PARAMETERS ##
+    n_1 = 1  # Assume to be air
+    n_2 = 1.3  # Assume to be an oil of some sort
+    reflected_1_2 = n_2 > n_1 # IF n_2 > n_1, directly reflected power has a 180 degree phase shift
+    n_3 = 1.5 # Used ony as base condition, enforces pi shift off base
+    reflected_2_3 = n_3 > n_2
+    d = 800e-9  # in meters
+    th_i = math.radians(60)
+    th_r = th_i
+    th_t = math.asin(n_1 * math.sin(th_i) / n_2)
+    OPD = 2 * n_2 * d * math.cos(th_t) # Optical path difference, phase shift due to longer transmitted path
+    Z0 = 376.7303  # constant
+    ## Calculate reflectance/transmission going 1 --> 2
+    z_1 = Z0 / n_1
+    z_2 = Z0 / n_2
+    R_s = ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ** 2
+    R_p = ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ** 2
+    R = 0.5 * (R_s + R_p)
+    T = 1 - R
+    ## Calculate reflectance/transmission going 2 --> 1
+    z_1 = Z0 / n_2
+    z_2 = Z0 / n_1
+    Ru_s = ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ** 2
+    Ru_p = ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ** 2
+    Ru = 0.5 * (Ru_s + Ru_p)
+    Tu = 1 - Ru
+    ## Quick and dirty perfect base reflector assumption
+    R_base = 1
+    T_base = 0
+
+    ## SIMULATION PARAMETERS ##
+    num_inter_refl = 5 # 100 vs 10 showed very little difference, and even 5 vs 3 had little difference, below 3 is noticable though
+
+
+
+
+
+    
+
+
+
+    spectrum_num = 1000
+    wavlen_min = 300e-9 # in meters
+    wavlen_max = 800e-9 # in meters
+
+    specturm_wavlen = np.linspace(wavlen_min, wavlen_max, spectrum_num)
+    master_spectrum = np.ones(spectrum_num) # This is the incident spectrum can define to something else later!
+
+
+    # ## Plot some stuff first
+    # plt.figure()
+    # plt.plot([i for i in range(90)], R_list)
+    # plt.plot([i for i in range(90)], T_list)
+    # plt.legend(['reflectance', 'transmission'])
+    # plt.show()
+    #
+    # plt.figure()
+    # plt.plot(specturm_wavlen, master_spectrum)
+    # plt.show()
+
+    # incid_ang =
+    r, g, b, cur_spectrum = compute_thinfilm()
+    print("{0}, {1}, {2}".format(r, g, b))
 
     plt.figure()
-    plt.plot(specturm_wavlen, spectrum_norm_mag)
+    plt.plot(specturm_wavlen, cur_spectrum)
+
+    recalculate_global_params(20)
+    print(th_i)
+    r, g, b, cur_spectrum = compute_thinfilm()
+    print("{0}, {1}, {2}".format(r, g, b))
+
+    plt.plot(specturm_wavlen, cur_spectrum)
     plt.show()
 
-    x,y,z = sample_CIE_color(specturm_wavlen, spectrum_norm_mag)
-    r,g,b = convert_to_rgb(x,y,z)
-
-    print(x)
-    print(y)
-    print(z)
-
-    print(r)
-    print(g)
-    print(b)
 
 
-    pass
-
-
-
-
-
-
-
-
+pass
