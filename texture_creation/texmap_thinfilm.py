@@ -7,6 +7,7 @@ import math
 from PIL import Image
 import matplotlib.pyplot as plt
 import colour
+import matplotlib.pyplot as plt
 
 # -----------------------------------------------------------------------------#
 #                                 DEFINES                                      #
@@ -191,42 +192,47 @@ def recalculate_global_params(new_th):
     Tu = 1 - Ru
 
 
+def sweep_to_sim_theta(in_th):
+    out_th = abs(in_th - 90)
+    return out_th
+
+
 
 
 # -----------------------------------------------------------------------------#
 #                                   MAIN                                       #
 # -----------------------------------------------------------------------------#
 if __name__ == "__main__":
-    R_list = []
-    T_list = []
-    for i in range(90):
-
-        ## SIMULATION PARAMETERS ##
-        n_1 = 1 # Assume to be air
-        n_2 = 1.3 # Assume to be an oil of some sort
-        d = 500e-9 # in meters
-        th_i = math.radians(i)
-        th_r = th_i
-        th_t = math.asin( n_1*math.sin(th_i)/n_2 )
-        Z0 = 376.7303 # constant
-        z_1 = Z0 / n_1
-        z_2 = Z0 / n_2
-        R_s = ( ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ) ** 2
-        R_p = ( ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ) ** 2
-        R = 0.5 * (R_s + R_p)
-        T = 1 - R
-        R_list.append(R)
-        T_list.append(T)
+    # R_list = []
+    # T_list = []
+    # for i in range(90):
+    #
+    #     ## SIMULATION PARAMETERS ##
+    #     n_1 = 1 # Assume to be air
+    #     n_2 = 1.3 # Assume to be an oil of some sort
+    #     d = 50e-9 # in meters
+    #     th_i = math.radians(i)
+    #     th_r = th_i
+    #     th_t = math.asin( n_1*math.sin(th_i)/n_2 )
+    #     Z0 = 376.7303 # constant
+    #     z_1 = Z0 / n_1
+    #     z_2 = Z0 / n_2
+    #     R_s = ( ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ) ** 2
+    #     R_p = ( ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ) ** 2
+    #     R = 0.5 * (R_s + R_p)
+    #     T = 1 - R
+    #     R_list.append(R)
+    #     T_list.append(T)
 
 
     ## TODO: Might need to calculate R_s and R_p seperately? not sure
     ## PHYSICAL PARAMETERS ##
     n_1 = 1  # Assume to be air
-    n_2 = 1.3  # Assume to be an oil of some sort
+    n_2 = 1.5  # Assume to be an oil of some sort
     reflected_1_2 = n_2 > n_1 # IF n_2 > n_1, directly reflected power has a 180 degree phase shift
-    n_3 = 1.5 # Used ony as base condition, enforces pi shift off base
+    n_3 = 5 # Used ony as base condition, enforces pi shift off base
     reflected_2_3 = n_3 > n_2
-    d = 800e-9  # in meters
+    d = 500e-9  # in meters
     th_i = math.radians(60)
     th_r = th_i
     th_t = math.asin(n_1 * math.sin(th_i) / n_2)
@@ -252,48 +258,59 @@ if __name__ == "__main__":
 
     ## SIMULATION PARAMETERS ##
     num_inter_refl = 5 # 100 vs 10 showed very little difference, and even 5 vs 3 had little difference, below 3 is noticable though
-
-
-
-
-
-    
-
-
-
     spectrum_num = 1000
-    wavlen_min = 300e-9 # in meters
-    wavlen_max = 800e-9 # in meters
-
-    specturm_wavlen = np.linspace(wavlen_min, wavlen_max, spectrum_num)
-    master_spectrum = np.ones(spectrum_num) # This is the incident spectrum can define to something else later!
+    wavlen_min = 300e-9  # in meters
+    wavlen_max = 800e-9  # in meters
 
 
-    # ## Plot some stuff first
+
+
+    ## NOTE: our simulation level functions comptue things in radians, but the recalculate function takes in degrees!
+    ## Therefore high level list will be in degrees
+    th_sweep_RGBlist = []
+    th_res = 0.25
+    th_sweep = np.linspace(0,180, round(180/th_res) + 1)
+
+
+    for i, cur_th in enumerate(th_sweep):
+        sim_th = sweep_to_sim_theta(cur_th)
+        recalculate_global_params(sim_th)
+        specturm_wavlen = np.linspace(wavlen_min, wavlen_max, spectrum_num)
+        master_spectrum = np.ones(spectrum_num) # This is the incident spectrum can define to something else later!
+        r, g, b, cur_spectrum = compute_thinfilm()
+        th_sweep_RGBlist.append(np.array([r,g,b]))
+        if i % 10 == 0:
+            print(i)
+
+
+
+
+    # recalculate_global_params(20)
+    # print(th_i)
+    # r, g, b, cur_spectrum = compute_thinfilm()
+    # print("{0}, {1}, {2}".format(r, g, b))
     # plt.figure()
-    # plt.plot([i for i in range(90)], R_list)
-    # plt.plot([i for i in range(90)], T_list)
-    # plt.legend(['reflectance', 'transmission'])
-    # plt.show()
-    #
-    # plt.figure()
-    # plt.plot(specturm_wavlen, master_spectrum)
+    # plt.plot(specturm_wavlen, cur_spectrum)
     # plt.show()
 
-    # incid_ang =
-    r, g, b, cur_spectrum = compute_thinfilm()
-    print("{0}, {1}, {2}".format(r, g, b))
+    tex_x = 1000
+    tex_y = 1000
+    out_text = np.zeros((tex_x, tex_y, 3), dtype=np.uint8)
 
-    plt.figure()
-    plt.plot(specturm_wavlen, cur_spectrum)
 
-    recalculate_global_params(20)
-    print(th_i)
-    r, g, b, cur_spectrum = compute_thinfilm()
-    print("{0}, {1}, {2}".format(r, g, b))
+    split_div = tex_x / len(th_sweep_RGBlist)
+    for i in range(tex_x):
+        tp_x = math.floor(i/split_div)
+        for j in range(tex_y):
+            out_text[j][i][:] = 256*th_sweep_RGBlist[tp_x]
 
-    plt.plot(specturm_wavlen, cur_spectrum)
-    plt.show()
+    ## Save the image we've produced!
+    im = Image.fromarray(out_text)
+    im.save("thinfilm_1D_1layer_color_spectrum.png")
+
+
+
+
 
 
 
