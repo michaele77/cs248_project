@@ -156,6 +156,7 @@ vec3 strange_normal_BRDF(vec3 L, vec3 V, vec3 N, vec3 diffuse_color, vec3 specul
 
 vec3 texture_map(vec3 L, vec3 V, vec3 N, vec3 diffuse_color, vec3 specular_color, float specular_exponent)
 {
+    // We will use the specular_exponent to transfer information from JSON file to the fragment shader without totally ripping up the application
     vec3 L_norm = normalize(L);
     vec3 V_norm = normalize(V);
     vec3 N_norm = normalize(N);
@@ -171,23 +172,69 @@ vec3 texture_map(vec3 L, vec3 V, vec3 N, vec3 diffuse_color, vec3 specular_color
     // vec3 temp_refl = cross(N_norm, V_norm);
     // float opp_side = dot(temp_inc, temp_refl);
     // bool is_opposite = opp_side >= 0;
-
+    
 
     // Now we define a basis coordinate system from which we can calculate our radial coordinates
     // Define X axis as the axis "underneath" the incoming light
     vec3 naxis_Y = cross(vec3(1,0,0), N_norm);
     naxis_Y = normalize(naxis_Y);
     vec3 naxis_X = cross(naxis_Y, N_norm);
+    naxis_X = normalize(naxis_X);
 
-    float theta = 0.5 * (1 - dot(naxis_X, L_norm));
-    float phi = 0.5 * (1 - dot(naxis_X, V_norm));
+    float theta = (1 - dot(naxis_X, L_norm));
+    float phi = (1 - dot(naxis_X, V_norm));
     vec2 new_text_coords = vec2(theta, phi);
 
+    vec2 film_coords = new_text_coords;
 
+    vec3 film_color = texture(environmentTextureSampler, film_coords).rgb;
+    vec3 direct_sample_color = texture(diffuseTextureSampler, texcoord).rgb;
     vec3 color_to_see = texture(diffuseTextureSampler, new_text_coords).rgb; 
-    color_to_see = dot(L_norm, N_norm) * color_to_see; // use lampertian shading: I = dot(L,N)*mapped_tex*intensity  <--  no intensity, multiplied later 
     
-    return color_to_see;
+
+    float specular_exponent_true = 20.0;
+    vec3 spec_ext = vec3(0.3,0.3,0.3);
+    float diffuse = max(dot(normalize(L), normalize(N)), 0.); // make sure it is positive
+    vec3 R = 2*dot(normalize(L), normalize(N))*N - normalize(L);
+    float spec = pow(max(dot(normalize(R),normalize(V)),0.0), specular_exponent_true);
+
+    
+
+    
+    if (specular_exponent == 1.0) {
+        // lambertian shading: I = dot(L,N)*mapped_tex*intensity  <--  no intensity, multiplied later 
+        color_to_see = dot(L_norm, N_norm) * color_to_see; 
+
+        // Add faked specular "glare"
+        color_to_see =  color_to_see + spec_ext*spec;
+
+        return color_to_see;
+
+    } else if (specular_exponent == 7.0) {
+        // If we are here, then we will directly sample a texture map from diffuse texture map for the "real" color
+        // We will apply the film color on top with some coefficient
+        float application_coef = 0.5;
+
+        // lambertian shading: I = dot(L,N)*mapped_tex*intensity  <--  no intensity, multiplied later 
+        color_to_see = dot(L_norm, N_norm) * color_to_see; 
+
+        // apply thin film with attenuation by application coefficient
+        color_to_see = (1-application_coef)*direct_sample_color + application_coef*film_color;
+
+        // Add faked specular "glare"
+        color_to_see =  diffuse*color_to_see + spec_ext*spec;
+        
+        return color_to_see;
+        
+    } else if (specular_exponent == 10.0) {
+        // Produce pure texture map, no lambertian shading
+
+        // Add faked specular "glare"
+        color_to_see =  diffuse*color_to_see + spec_ext*spec;
+        
+        return color_to_see;
+        
+    }
 
 }
 
@@ -230,15 +277,21 @@ void main(void)
 	// Pattern generation. Compute parameters to BRDF 
     //////////////////////////////////////////////////////////////////////////
     
+    // BY CONVENTION, we will store the "default color" texture in the diffuse color which is in the diffuseTextureSampler
+    // We will store film color to superimpose onto the diffuse color in environmentTextureSampler
+    // NOTE: If we want to for example show a mirror texture, now we must use diffuseTextureSampler...upon which we can use a thin film
 	vec3 diffuseColor = vec3(1.0, 1.0, 1.0);
     vec3 specularColor = vec3(1.0, 1.0, 1.0);
+    vec3 filmColor = vec3(0, 0, 0);
     float specularExponent = spec_exp;
 
-    if (useTextureMapping) {
-        diffuseColor = texture(diffuseTextureSampler, texcoord).rgb;
-    } else {
-        diffuseColor = vertex_diffuse_color;
-    }
+    diffuseColor = texture(diffuseTextureSampler, texcoord).rgb;
+
+    // if (useTextureMapping) {
+    //     diffuseColor = texture(diffuseTextureSampler, texcoord).rgb;
+    // } else {
+    //     diffuseColor = vertex_diffuse_color;
+    // }
 
     // perform normal map lookup if required
     vec3 N = vec3(0);
@@ -255,7 +308,14 @@ void main(void)
     }
 
     vec3 V = normalize(dir2camera);
-    vec3 Lo = vec3(0.1 * diffuseColor);   // this is ambient
+
+    // Define ambient light; if we are sampling angle-based texture, don't want ambient coming through
+    // Only want ambient during thin film application, which is code 7
+    vec3 Lo = vec3(0,0,0);
+    if (specularExponent == 7.0){
+        Lo = vec3(0.1 * diffuseColor);   // this is ambient
+    }
+    
 
     /////////////////////////////////////////////////////////////////////////
     // Phase 2: Evaluate lighting and surface BRDF 

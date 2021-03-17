@@ -27,6 +27,7 @@ Mesh::Mesh(Collada::PolymeshInfo& polyMesh, const Matrix4x4& transform) {
 	useMirrorBrdf_ = polyMesh.is_mirror_brdf;
 	phongSpecExponent_ = polyMesh.phong_spec_exp;
 
+
     //printf("Mesh details:\n");
     //printf("   num polys:     %lu\n", polyMesh.polygons.size());
     //printf("   num verts:     %lu\n", polyMesh.vertices.size());
