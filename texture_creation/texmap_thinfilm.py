@@ -12,6 +12,9 @@ import matplotlib.pyplot as plt
 # -----------------------------------------------------------------------------#
 #                                 DEFINES                                      #
 # -----------------------------------------------------------------------------#
+Run_identifier = '1D'
+Run_identifier = 'scatter'
+
 ## Got the CIE color curves from the following: https://www.fourmilab.ch/documents/specrend/specrend.c
 ## 380nm to 780nm every 5nm
 CIE_wavlen = np.linspace(380e-9, 780e-9, 81)
@@ -197,121 +200,208 @@ def sweep_to_sim_theta(in_th):
     return out_th
 
 
+## Helper function that given an ideal reflectance angle returns a list of magnitudes to attenuate your color by
+## Some amount related to offset angle
+## Because we have no second degree dynamics, we need to fill out every phi for every thera
+## --> Therefore, compute your scatter shot magnitudes for the whole sweep of 0-180 for phi
+## NOTE: This is in degrees!
+def scatter_shot_gen(input_th):
+    print("scattering angle {0}".format(input_th))
+    ## We have already defined a global phi sweep
+    global ph_sweep
+
+    ## Our perfect reflection is just the opposite across the 90
+    perf_refl = 180 - input_th
+    ## Define our diffusion angle as the minimum of bounds and 30 degrees
+    scatter_spread = 90
+    refl_range = min(abs(perf_refl-0), abs(perf_refl-180), scatter_spread)
+
+
+
+    scatter_ang = np.zeros(len(ph_sweep))
+    eps = 0.0001
+    for i,ph_ang in enumerate(ph_sweep):
+        abs_diff = abs(ph_ang - perf_refl)/(refl_range+eps)
+        if abs_diff > 1:
+            # If we're here, were out of the scatter range
+            continue
+        scatter_ang[i] = 1 - abs_diff**0.7
+
+        # scatter_ang[i] = 1-math.sqrt(abs_diff) # Creates a shooting star with slow fall off almost...
+        # scatter_ang[i] = 1 - abs_diff**2 # Creates solid middle and soft edges
+        # scatter_ang[i] = abs_diff**2 # Creates very interesting inverse color square
+        # scatter_ang[i] = 1 - abs_diff
+
+
+
+    return scatter_ang
+
+
+
+
+
 
 
 # -----------------------------------------------------------------------------#
 #                                   MAIN                                       #
 # -----------------------------------------------------------------------------#
 if __name__ == "__main__":
-    # R_list = []
-    # T_list = []
-    # for i in range(90):
-    #
-    #     ## SIMULATION PARAMETERS ##
-    #     n_1 = 1 # Assume to be air
-    #     n_2 = 1.3 # Assume to be an oil of some sort
-    #     d = 50e-9 # in meters
-    #     th_i = math.radians(i)
-    #     th_r = th_i
-    #     th_t = math.asin( n_1*math.sin(th_i)/n_2 )
-    #     Z0 = 376.7303 # constant
-    #     z_1 = Z0 / n_1
-    #     z_2 = Z0 / n_2
-    #     R_s = ( ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ) ** 2
-    #     R_p = ( ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ) ** 2
-    #     R = 0.5 * (R_s + R_p)
-    #     T = 1 - R
-    #     R_list.append(R)
-    #     T_list.append(T)
 
+    if Run_identifier == "1D":
 
-    ## TODO: Might need to calculate R_s and R_p seperately? not sure
-    ## PHYSICAL PARAMETERS ##
-    n_1 = 1  # Assume to be air
-    n_2 = 1.5  # Assume to be an oil of some sort
-    reflected_1_2 = n_2 > n_1 # IF n_2 > n_1, directly reflected power has a 180 degree phase shift
-    n_3 = 5 # Used ony as base condition, enforces pi shift off base
-    reflected_2_3 = n_3 > n_2
-    d = 500e-9  # in meters
-    th_i = math.radians(60)
-    th_r = th_i
-    th_t = math.asin(n_1 * math.sin(th_i) / n_2)
-    OPD = 2 * n_2 * d * math.cos(th_t) # Optical path difference, phase shift due to longer transmitted path
-    Z0 = 376.7303  # constant
-    ## Calculate reflectance/transmission going 1 --> 2
-    z_1 = Z0 / n_1
-    z_2 = Z0 / n_2
-    R_s = ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ** 2
-    R_p = ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ** 2
-    R = 0.5 * (R_s + R_p)
-    T = 1 - R
-    ## Calculate reflectance/transmission going 2 --> 1
-    z_1 = Z0 / n_2
-    z_2 = Z0 / n_1
-    Ru_s = ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ** 2
-    Ru_p = ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ** 2
-    Ru = 0.5 * (Ru_s + Ru_p)
-    Tu = 1 - Ru
-    ## Quick and dirty perfect base reflector assumption
-    R_base = 1
-    T_base = 0
+        ## TODO: Might need to calculate R_s and R_p seperately? not sure
+        ## PHYSICAL PARAMETERS ##
+        n_1 = 1  # Assume to be air
+        n_2 = 1.3  # Assume to be an oil of some sort
+        reflected_1_2 = n_2 > n_1 # IF n_2 > n_1, directly reflected power has a 180 degree phase shift
+        n_3 = 5 # Used ony as base condition, enforces pi shift off base
+        reflected_2_3 = n_3 > n_2
+        d = 500e-9  # in meters
+        th_i = math.radians(60)
+        th_r = th_i
+        th_t = math.asin(n_1 * math.sin(th_i) / n_2)
+        OPD = 2 * n_2 * d * math.cos(th_t) # Optical path difference, phase shift due to longer transmitted path
+        Z0 = 376.7303  # constant
+        ## Calculate reflectance/transmission going 1 --> 2
+        z_1 = Z0 / n_1
+        z_2 = Z0 / n_2
+        R_s = ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ** 2
+        R_p = ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ** 2
+        R = 0.5 * (R_s + R_p)
+        T = 1 - R
+        ## Calculate reflectance/transmission going 2 --> 1
+        z_1 = Z0 / n_2
+        z_2 = Z0 / n_1
+        Ru_s = ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ** 2
+        Ru_p = ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ** 2
+        Ru = 0.5 * (Ru_s + Ru_p)
+        Tu = 1 - Ru
+        ## Quick and dirty perfect base reflector assumption
+        R_base = 1
+        T_base = 0
 
-    ## SIMULATION PARAMETERS ##
-    num_inter_refl = 5 # 100 vs 10 showed very little difference, and even 5 vs 3 had little difference, below 3 is noticable though
-    spectrum_num = 1000
-    wavlen_min = 300e-9  # in meters
-    wavlen_max = 800e-9  # in meters
+        ## SIMULATION PARAMETERS ##
+        num_inter_refl = 5 # 100 vs 10 showed very little difference, and even 5 vs 3 had little difference, below 3 is noticable though
+        spectrum_num = 1000
+        wavlen_min = 300e-9  # in meters
+        wavlen_max = 800e-9  # in meters
 
 
 
 
-    ## NOTE: our simulation level functions comptue things in radians, but the recalculate function takes in degrees!
-    ## Therefore high level list will be in degrees
-    th_sweep_RGBlist = []
-    th_res = 0.25
-    th_sweep = np.linspace(0,180, round(180/th_res) + 1)
+        ## NOTE: our simulation level functions comptue things in radians, but the recalculate function takes in degrees!
+        ## Therefore high level list will be in degrees
+        th_sweep_RGBlist = []
+        th_res = 0.25
+        th_sweep = np.linspace(0,180, round(180/th_res) + 1)
 
 
-    for i, cur_th in enumerate(th_sweep):
-        sim_th = sweep_to_sim_theta(cur_th)
-        recalculate_global_params(sim_th)
-        specturm_wavlen = np.linspace(wavlen_min, wavlen_max, spectrum_num)
-        master_spectrum = np.ones(spectrum_num) # This is the incident spectrum can define to something else later!
-        r, g, b, cur_spectrum = compute_thinfilm()
-        th_sweep_RGBlist.append(np.array([r,g,b]))
-        if i % 10 == 0:
-            print(i)
+        for i, cur_th in enumerate(th_sweep):
+            sim_th = sweep_to_sim_theta(cur_th)
+            recalculate_global_params(sim_th)
+            specturm_wavlen = np.linspace(wavlen_min, wavlen_max, spectrum_num)
+            master_spectrum = np.ones(spectrum_num) # This is the incident spectrum can define to something else later!
+
+            r, g, b, cur_spectrum = compute_thinfilm()
+            th_sweep_RGBlist.append(np.array([r,g,b]))
+            if i % 10 == 0:
+                print(i)
 
 
+        ## Now let's display swept RGB output data on a 1D colorful spectrum!
+        tex_x = 1000
+        tex_y = 1000
+        out_text = np.zeros((tex_x, tex_y, 3), dtype=np.uint8)
 
 
-    # recalculate_global_params(20)
-    # print(th_i)
-    # r, g, b, cur_spectrum = compute_thinfilm()
-    # print("{0}, {1}, {2}".format(r, g, b))
-    # plt.figure()
-    # plt.plot(specturm_wavlen, cur_spectrum)
-    # plt.show()
+        split_div = tex_x / len(th_sweep_RGBlist)
+        for i in range(tex_x):
+            tp_x = math.floor(i/split_div)
+            for j in range(tex_y):
+                out_text[j][i][:] = 256*th_sweep_RGBlist[tp_x]
 
-    tex_x = 1000
-    tex_y = 1000
-    out_text = np.zeros((tex_x, tex_y, 3), dtype=np.uint8)
-
-
-    split_div = tex_x / len(th_sweep_RGBlist)
-    for i in range(tex_x):
-        tp_x = math.floor(i/split_div)
-        for j in range(tex_y):
-            out_text[j][i][:] = 256*th_sweep_RGBlist[tp_x]
-
-    ## Save the image we've produced!
-    im = Image.fromarray(out_text)
-    im.save("thinfilm_1D_1layer_color_spectrum.png")
+        ## Save the image we've produced!
+        im = Image.fromarray(out_text)
+        im.save("thinfilm_1D_1layer_color_spectrum.png")
 
 
 
 
 
 
+
+
+
+    elif Run_identifier == "scatter":
+
+        ## TODO: Might need to calculate R_s and R_p seperately? not sure
+        ## PHYSICAL PARAMETERS ##
+        n_1 = 1  # Assume to be air
+        n_2 = 1.1  # Assume to be an oil of some sort
+        reflected_1_2 = n_2 > n_1  # IF n_2 > n_1, directly reflected power has a 180 degree phase shift
+        n_3 = 1.5  # Used ony as base condition, enforces pi shift off base
+        reflected_2_3 = n_3 > n_2
+        d = 500e-9  # in meters
+        th_i = math.radians(60)
+        th_r = th_i
+        th_t = math.asin(n_1 * math.sin(th_i) / n_2)
+        OPD = 2 * n_2 * d * math.cos(th_t)  # Optical path difference, phase shift due to longer transmitted path
+        Z0 = 376.7303  # constant
+        ## Calculate reflectance/transmission going 1 --> 2
+        z_1 = Z0 / n_1
+        z_2 = Z0 / n_2
+        R_s = ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ** 2
+        R_p = ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ** 2
+        R = 0.5 * (R_s + R_p)
+        T = 1 - R
+        ## Calculate reflectance/transmission going 2 --> 1
+        z_1 = Z0 / n_2
+        z_2 = Z0 / n_1
+        Ru_s = ((z_2 * math.cos(th_t) - z_1 * math.cos(th_i)) / (z_2 * math.cos(th_t) + z_1 * math.cos(th_i))) ** 2
+        Ru_p = ((z_2 * math.cos(th_i) - z_1 * math.cos(th_t)) / (z_2 * math.cos(th_i) + z_1 * math.cos(th_t))) ** 2
+        Ru = 0.5 * (Ru_s + Ru_p)
+        Tu = 1 - Ru
+        ## Quick and dirty perfect base reflector assumption
+        R_base = 1
+        T_base = 0
+
+        ## SIMULATION PARAMETERS ##
+        num_inter_refl = 5  # 100 vs 10 showed very little difference, and even 5 vs 3 had little difference, below 3 is noticable though
+        spectrum_num = 1000
+        wavlen_min = 300e-9  # in meters
+        wavlen_max = 800e-9  # in meters
+
+        ## NOTE: our simulation level functions comptue things in radians, but the recalculate function takes in degrees!
+        ## Therefore high level list will be in degrees
+        th_sweep_RGBlist = []
+        th_res = 0.05
+        ph_res = 0.05
+        th_sweep = np.linspace(0, 180, round(180 / th_res) + 1)
+        ph_sweep = np.linspace(0, 180, round(180 / ph_res) + 1)
+        tex_x = len(th_sweep)
+        tex_y = len(ph_sweep)
+
+        texture = np.zeros((tex_x, tex_y, 3), dtype=np.uint8)
+
+
+        for i, cur_th in enumerate(th_sweep):
+            ## Now, compute a phi spread based on the "ideal reflected" phi
+            ## For each phi in the spreaded list, calculate each ones thinfilm
+
+            sim_th = sweep_to_sim_theta(cur_th)
+            recalculate_global_params(sim_th)
+            specturm_wavlen = np.linspace(wavlen_min, wavlen_max, spectrum_num)
+            master_spectrum = np.ones(spectrum_num)  # This is the incident spectrum can define to something else later!
+            r, g, b, cur_spectrum = compute_thinfilm()
+            rbg_pack = np.array([r,g,b])
+
+            phi_scatter_angs = scatter_shot_gen(cur_th)
+            for j, cur_mag in enumerate(phi_scatter_angs):
+                texture[tex_y - j - 1][i][:] = 256*rbg_pack*cur_mag
+
+
+        ## Save the image we've produced!
+        im = Image.fromarray(texture)
+        im.save("thinfilm_2D_HIRES_n2_" + str(n_2) + "-d_" + str(d*1e9) + "0p8_pow_scatterfunc.png")
 
 pass
