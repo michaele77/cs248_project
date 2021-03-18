@@ -181,8 +181,8 @@ vec3 texture_map(vec3 L, vec3 V, vec3 N, vec3 diffuse_color, vec3 specular_color
     vec3 naxis_X = cross(naxis_Y, N_norm);
     naxis_X = normalize(naxis_X);
 
-    float theta = (1 - dot(naxis_X, L_norm));
-    float phi = (1 - dot(naxis_X, V_norm));
+    float theta = 0.5*(1 - dot(naxis_X, L_norm));
+    float phi = 0.5*(1 - dot(naxis_X, V_norm));
     vec2 new_text_coords = vec2(theta, phi);
 
     vec2 film_coords = new_text_coords;
@@ -234,6 +234,16 @@ vec3 texture_map(vec3 L, vec3 V, vec3 N, vec3 diffuse_color, vec3 specular_color
         
         return color_to_see;
         
+    } else if (specular_exponent == 20.0) {
+        // Use this if we want direct texture sampling, no angle based stuff
+
+        // lambertian shading: I = dot(L,N)*mapped_tex*intensity  <--  no intensity, multiplied later 
+        direct_sample_color = dot(L_norm, N_norm) * direct_sample_color; 
+
+        // Add faked specular "glare"
+        direct_sample_color =  direct_sample_color + spec_ext*spec;
+
+        return direct_sample_color;
     }
 
 }
@@ -312,7 +322,7 @@ void main(void)
     // Define ambient light; if we are sampling angle-based texture, don't want ambient coming through
     // Only want ambient during thin film application, which is code 7
     vec3 Lo = vec3(0,0,0);
-    if (specularExponent == 7.0){
+    if (specularExponent == 7.0 || specularExponent == 20.0){
         Lo = vec3(0.1 * diffuseColor);   // this is ambient
     }
     

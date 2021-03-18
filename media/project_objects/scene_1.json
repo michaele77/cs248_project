@@ -1,0 +1,153 @@
+{
+    "base_shader_dir" : "..",
+    
+	"camera" :
+	{
+		"id" : "Camera_001-camera",
+		"name" : "Camera.002",
+		"xfov" : 50,
+		"yfov" : 35,
+		"znear" : 0.1,
+		"zfar" : 10000.0,
+		"aspect_ratio" : 1.777778,
+		"up_axis" : "Y_UP",
+		"target_position" : [0, 0, 0],
+		"dir2cam" : [13, 31, 162]
+	},
+    
+    "lights" :
+	[
+		{
+			"id" : "spotlight",
+		    "name" : "main_spotlight",
+			"type" : "spot",
+            "position" : [0, 200, 200],
+			"direction" : [0, -1, -1],
+            "falloff_deg" : 20.0,
+            "intensity" : [40000, 40000, 40000]
+		},
+
+        {
+			"id" : "spotlight",
+		    "name" : "main_spotlight",
+			"type" : "spot",
+            "position" : [-200, 200, 200],
+			"direction" : [1, -1, -1],
+            "falloff_deg" : 20.0,
+            "intensity" : [40000, 12000, 12000]
+		},
+
+		{
+			"id" : "spotlight",
+		    "name" : "main_spotlight",
+			"type" : "spot",
+            "position" : [200, 200, 200],
+			"direction" : [-1, -1, -1],
+            "falloff_deg" : 20.0,
+            "intensity" : [12000, 40000, 40000]
+		}
+	],
+    
+    "meshes" :
+	[
+
+ 
+
+
+
+
+		{
+			"filename" : "hand_3.obj",
+            "translate" : [0, 0, 0],
+            "scale" : [10, 10, 10],
+            "material" : "phong",
+            "diffuse_filename" : "../textures/human_skin_1.png",
+            "normal_filename" : "../textures/brick_normal_map.png",
+			"spec_exp" : 20.0,
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 10,
+            "texcoord_v_scale" : 10,
+			"vertex_shader_filename" : "../shader_thinfilm.vert",
+			"fragment_shader_filename" : "../shader_thinfilm.frag"
+		},
+
+		{
+			"filename" : "box_in_hand_2.obj",
+            "translate" : [0, 0, 0],
+            "scale" : [10, 10, 10],
+            "material" : "phong",
+			"diffuse_filename" : "../textures/machined_0_blur1.png",
+			"spec_exp" : 10.0,
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 1,
+            "texcoord_v_scale" : 1,
+			"vertex_shader_filename" : "../shader_thinfilm.vert",
+			"fragment_shader_filename" : "../shader_thinfilm.frag"
+		},
+
+		{
+			"filename" : "butterfly_1.obj",
+            "translate" : [0, 0, 0],
+            "scale" : [10, 10, 10],
+            "material" : "phong",
+			"diffuse_filename" : "../textures/haley_morpho_brdf_blur.png",
+			"spec_exp" : 10.0,
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 1,
+            "texcoord_v_scale" : 1,
+			"vertex_shader_filename" : "../shader_thinfilm.vert",
+			"fragment_shader_filename" : "../shader_thinfilm.frag"
+		},
+
+		{
+			"filename" : "butterfly_2.obj",
+            "translate" : [0, 0, 0],
+            "scale" : [10, 10, 10],
+            "material" : "phong",
+			"diffuse_filename" : "../textures/haley_morpho_brdf_blur.png",
+			"spec_exp" : 10.0,
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 1,
+            "texcoord_v_scale" : 1,
+			"vertex_shader_filename" : "../shader_thinfilm.vert",
+			"fragment_shader_filename" : "../shader_thinfilm.frag"
+		},
+
+		{
+			"filename" : "butterfly_3.obj",
+            "translate" : [0, 0, 0],
+            "scale" : [10, 10, 10],
+            "material" : "phong",
+			"diffuse_filename" : "../textures/haley_morpho_brdf_blur.png",
+			"spec_exp" : 10.0,
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 1,
+            "texcoord_v_scale" : 1,
+			"vertex_shader_filename" : "../shader_thinfilm.vert",
+			"fragment_shader_filename" : "../shader_thinfilm.frag"
+		},
+
+
+		{
+			"filename" : "waves.obj",
+            "translate" : [0, -20, 0],
+            "scale" : [50, 50, 50],
+            "material" : "phong",
+			"diffuse_filename" : "../textures/seamless_water_0.png",
+			"environment_filename" : "../textures/thinfilm_0.png",
+			"spec_exp" : 7.0,
+			"texcoord_v_flip" : "true",
+            "texcoord_u_scale" : 5,
+            "texcoord_v_scale" : 5,
+			"vertex_shader_filename" : "../shader_thinfilm.vert",
+			"fragment_shader_filename" : "../shader_thinfilm.frag"
+		}
+
+
+
+
+
+
+
+	]
+}

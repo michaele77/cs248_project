@@ -35,8 +35,10 @@ if __name__ == "__main__":
     ## Custom window slider is...
 
 
-    im = Image.open("hires_diffusehole_17branches_5stop.png")
+    im = Image.open("machined_0.png")
+    test_im = Image.open("Blue_Marble_002_NORM.png")
 
+    test_im = Image.fromarray(np.array(test_im)- 50)
     # im_arr = np.array(im, dtype = np.float)
     #
     # window_avg = 2 ## MAKE SURE THIS IS EVEN
@@ -60,5 +62,7 @@ if __name__ == "__main__":
     # out_im = im.resize(new_size)
     # out_im = Image.fromarray(out_img)
     out_im.save("blurred_texture.png")
+
+    test_im.save("new_text.png")
 
 
