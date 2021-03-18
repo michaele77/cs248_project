@@ -213,7 +213,7 @@ def scatter_shot_gen(input_th):
     ## Our perfect reflection is just the opposite across the 90
     perf_refl = 180 - input_th
     ## Define our diffusion angle as the minimum of bounds and 30 degrees
-    scatter_spread = 90
+    scatter_spread = 30
     refl_range = min(abs(perf_refl-0), abs(perf_refl-180), scatter_spread)
 
 
@@ -225,9 +225,9 @@ def scatter_shot_gen(input_th):
         if abs_diff > 1:
             # If we're here, were out of the scatter range
             continue
-        scatter_ang[i] = 1 - abs_diff**0.7
+        # scatter_ang[i] = 1 - abs_diff**0.7
 
-        # scatter_ang[i] = 1-math.sqrt(abs_diff) # Creates a shooting star with slow fall off almost...
+        scatter_ang[i] = 1-math.sqrt(abs_diff) # Creates a shooting star with slow fall off almost...
         # scatter_ang[i] = 1 - abs_diff**2 # Creates solid middle and soft edges
         # scatter_ang[i] = abs_diff**2 # Creates very interesting inverse color square
         # scatter_ang[i] = 1 - abs_diff
@@ -252,7 +252,7 @@ if __name__ == "__main__":
         ## TODO: Might need to calculate R_s and R_p seperately? not sure
         ## PHYSICAL PARAMETERS ##
         n_1 = 1  # Assume to be air
-        n_2 = 1.3  # Assume to be an oil of some sort
+        n_2 = 1.5  # Assume to be an oil of some sort
         reflected_1_2 = n_2 > n_1 # IF n_2 > n_1, directly reflected power has a 180 degree phase shift
         n_3 = 5 # Used ony as base condition, enforces pi shift off base
         reflected_2_3 = n_3 > n_2
@@ -374,8 +374,8 @@ if __name__ == "__main__":
         ## NOTE: our simulation level functions comptue things in radians, but the recalculate function takes in degrees!
         ## Therefore high level list will be in degrees
         th_sweep_RGBlist = []
-        th_res = 0.05
-        ph_res = 0.05
+        th_res = 0.5
+        ph_res = 0.5
         th_sweep = np.linspace(0, 180, round(180 / th_res) + 1)
         ph_sweep = np.linspace(0, 180, round(180 / ph_res) + 1)
         tex_x = len(th_sweep)

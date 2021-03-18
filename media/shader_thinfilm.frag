@@ -219,7 +219,7 @@ vec3 texture_map(vec3 L, vec3 V, vec3 N, vec3 diffuse_color, vec3 specular_color
         color_to_see = dot(L_norm, N_norm) * color_to_see; 
 
         // apply thin film with attenuation by application coefficient
-        color_to_see = (1-application_coef)*direct_sample_color + application_coef*film_color;
+        color_to_see = (1-application_coef/2)*direct_sample_color + application_coef*film_color;
 
         // Add faked specular "glare"
         color_to_see =  diffuse*color_to_see + spec_ext*spec;

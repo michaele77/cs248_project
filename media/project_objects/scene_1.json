@@ -21,30 +21,30 @@
 			"id" : "spotlight",
 		    "name" : "main_spotlight",
 			"type" : "spot",
-            "position" : [0, 200, 200],
+            "position" : [0, 250, 250],
 			"direction" : [0, -1, -1],
             "falloff_deg" : 20.0,
-            "intensity" : [40000, 40000, 40000]
+            "intensity" : [60000, 60000, 60000]
 		},
 
         {
 			"id" : "spotlight",
 		    "name" : "main_spotlight",
 			"type" : "spot",
-            "position" : [-200, 200, 200],
+            "position" : [-250, 250, 250],
 			"direction" : [1, -1, -1],
             "falloff_deg" : 20.0,
-            "intensity" : [40000, 12000, 12000]
+            "intensity" : [60000, 18000, 18000]
 		},
 
 		{
 			"id" : "spotlight",
 		    "name" : "main_spotlight",
 			"type" : "spot",
-            "position" : [200, 200, 200],
+            "position" : [250, 250, 250],
 			"direction" : [-1, -1, -1],
             "falloff_deg" : 20.0,
-            "intensity" : [12000, 40000, 40000]
+            "intensity" : [18000, 60000, 60000]
 		}
 	],
     
@@ -59,14 +59,14 @@
 		{
 			"filename" : "hand_3.obj",
             "translate" : [0, 0, 0],
-            "scale" : [10, 10, 10],
+            "scale" : [20, 20, 20],
             "material" : "phong",
             "diffuse_filename" : "../textures/human_skin_1.png",
-            "normal_filename" : "../textures/brick_normal_map.png",
+            "normal_filename" : "../textures/Quartz_001_NORM.png",
 			"spec_exp" : 20.0,
 			"texcoord_v_flip" : "true",
-            "texcoord_u_scale" : 10,
-            "texcoord_v_scale" : 10,
+            "texcoord_u_scale" : 5,
+            "texcoord_v_scale" : 5,
 			"vertex_shader_filename" : "../shader_thinfilm.vert",
 			"fragment_shader_filename" : "../shader_thinfilm.frag"
 		},
@@ -74,9 +74,9 @@
 		{
 			"filename" : "box_in_hand_2.obj",
             "translate" : [0, 0, 0],
-            "scale" : [10, 10, 10],
+            "scale" : [20, 20, 20],
             "material" : "phong",
-			"diffuse_filename" : "../textures/machined_0_blur1.png",
+			"diffuse_filename" : "../textures/thinfilm_2.png",
 			"spec_exp" : 10.0,
 			"texcoord_v_flip" : "true",
             "texcoord_u_scale" : 1,
@@ -88,9 +88,10 @@
 		{
 			"filename" : "butterfly_1.obj",
             "translate" : [0, 0, 0],
-            "scale" : [10, 10, 10],
+            "scale" : [20, 20, 20],
             "material" : "phong",
 			"diffuse_filename" : "../textures/haley_morpho_brdf_blur.png",
+			"normal_filename" : "../textures/Red_Marble_001_NRM.png",
 			"spec_exp" : 10.0,
 			"texcoord_v_flip" : "true",
             "texcoord_u_scale" : 1,
@@ -102,9 +103,10 @@
 		{
 			"filename" : "butterfly_2.obj",
             "translate" : [0, 0, 0],
-            "scale" : [10, 10, 10],
+            "scale" : [20, 20, 20],
             "material" : "phong",
 			"diffuse_filename" : "../textures/haley_morpho_brdf_blur.png",
+			"normal_filename" : "../textures/Red_Marble_001_NRM.png",
 			"spec_exp" : 10.0,
 			"texcoord_v_flip" : "true",
             "texcoord_u_scale" : 1,
@@ -116,9 +118,10 @@
 		{
 			"filename" : "butterfly_3.obj",
             "translate" : [0, 0, 0],
-            "scale" : [10, 10, 10],
+            "scale" : [20, 20, 20],
             "material" : "phong",
 			"diffuse_filename" : "../textures/haley_morpho_brdf_blur.png",
+			"normal_filename" : "../textures/Red_Marble_001_NRM.png",
 			"spec_exp" : 10.0,
 			"texcoord_v_flip" : "true",
             "texcoord_u_scale" : 1,
@@ -134,7 +137,7 @@
             "scale" : [50, 50, 50],
             "material" : "phong",
 			"diffuse_filename" : "../textures/seamless_water_0.png",
-			"environment_filename" : "../textures/thinfilm_0.png",
+			"environment_filename" : "../textures/thinfilm_2.png",
 			"spec_exp" : 7.0,
 			"texcoord_v_flip" : "true",
             "texcoord_u_scale" : 5,
